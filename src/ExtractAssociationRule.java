@@ -1,6 +1,8 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,46 +90,53 @@ public class ExtractAssociationRule {
 
 		mapping.put(1, new HashMap<Set<String>, Integer>());
 
-		//totalNumTransaction = calculateOneItemSet(lineAppear, mapping.get(1), eachLineInfo);
-
+		totalNumTransaction = calculateOneItemSet(lineAppear, mapping.get(1), eachLineInfo);
+		System.out.println("totalNumTransaction is " + totalNumTransaction);
 		///////////////////////////////////////////////////////////////////////////
-		totalNumTransaction = 4;
-		lineAppear.put(1, 1);
-		lineAppear.put(2, 1);
-		lineAppear.put(3, 1);
-		lineAppear.put(4, 1);
-		Set<String> yihong1 = new HashSet<String>();
-		yihong1.add("pen");
-		Set<String> yihong2 = new HashSet<String>();
-		yihong2.add("ink");
-		Set<String> yihong3 = new HashSet<String>();
-		yihong3.add("diary");
-		Set<String> yihong4 = new HashSet<String>();
-		yihong4.add("soap");
-		mapping.get(1).put(yihong1, 4);
-		mapping.get(1).put(yihong2, 3);
-		mapping.get(1).put(yihong3, 3);
-		mapping.get(1).put(yihong4, 2);
-		Set<String> yihong5 = new HashSet<String>();
-		yihong5.add("pen");
-		yihong5.add("ink");
-		yihong5.add("diary");
-		yihong5.add("soap");
-		Set<String> yihong6 = new HashSet<String>();
-		yihong6.add("pen");
-		yihong6.add("ink");
-		yihong6.add("diary");
-		Set<String> yihong7 = new HashSet<String>();
-		yihong7.add("pen");
-		yihong7.add("diary");
-		Set<String> yihong8 = new HashSet<String>();
-		yihong8.add("pen");
-		yihong8.add("ink");
-		yihong8.add("soap");
-		eachLineInfo.put(1, yihong5);
-		eachLineInfo.put(2, yihong6);
-		eachLineInfo.put(3, yihong7);
-		eachLineInfo.put(4, yihong8);
+//		totalNumTransaction = 4;
+//		lineAppear.put(1, 1);
+//		lineAppear.put(2, 1);
+//		lineAppear.put(3, 1);
+//		lineAppear.put(4, 1);
+//		Set<String> yihong1 = new HashSet<String>();
+//		yihong1.add("pink");
+//		Set<String> yihong2 = new HashSet<String>();
+//		yihong2.add("red");
+//		Set<String> yihong3 = new HashSet<String>();
+//		yihong3.add("yellow");
+//		Set<String> yihong4 = new HashSet<String>();
+//		yihong4.add("black");
+//		Set<String> yihong5 = new HashSet<String>();
+//		yihong4.add("white");
+//		Set<String> yihong6 = new HashSet<String>();
+//		yihong4.add("purple");
+//		mapping.get(1).put(yihong1, 1);
+//		mapping.get(1).put(yihong2, 3);
+//		mapping.get(1).put(yihong3, 4);
+//		mapping.get(1).put(yihong4, 3);
+//		mapping.get(1).put(yihong5, 1);
+//		mapping.get(1).put(yihong6, 1);
+//		Set<String> yihong7 = new HashSet<String>();
+//		yihong7.add("pink");
+//		yihong7.add("red");
+//		yihong7.add("yellow");
+//		Set<String> yihong8 = new HashSet<String>();
+//		yihong8.add("red");
+//		yihong8.add("black");
+//		yihong8.add("yellow");
+//		Set<String> yihong9 = new HashSet<String>();
+//		yihong9.add("yellow");
+//		yihong9.add("purple");
+//		yihong9.add("black");
+//		Set<String> yihong10 = new HashSet<String>();
+//		yihong10.add("black");
+//		yihong10.add("white");
+//		yihong10.add("yellow");
+//		yihong10.add("red");
+//		eachLineInfo.put(1, yihong7);
+//		eachLineInfo.put(2, yihong8);
+//		eachLineInfo.put(3, yihong9);
+//		eachLineInfo.put(4, yihong10);
 		///////////////////////////////////////////////////////////////////////////
 
 		int largeSetId = 1;
@@ -135,10 +144,10 @@ public class ExtractAssociationRule {
 		while (mapping.get(largeSetId++).size() != 0)
 		{
 			Set<Set<String>> candidates = aprioriGen(mapping, largeSetId - 1);
-			for (Set<String> candidatesTmp : candidates)
-			{
-				System.out.println("candidate is " + candidatesTmp);
-			}
+//			for (Set<String> candidatesTmp : candidates)
+//			{
+//				System.out.println("candidate is " + candidatesTmp);
+//			}
 			mapping.put(largeSetId, new HashMap<Set<String>, Integer>());
 			Map<Set<String>, Integer> largeItemSetNewRound = mapping.get(largeSetId);
 
@@ -146,14 +155,7 @@ public class ExtractAssociationRule {
 			for (Map.Entry<Integer, Set<String>> entry : eachLineInfo.entrySet())
 			{
 				Set<Set<String>> subsetCandidates = subSetCandidates(candidates, entry.getValue());
-				System.out.println("begining ------------");
 
-				for (Set<String> candidatesTmp : subsetCandidates)
-				{
-					System.out.println("line number is " + entry.getKey());
-					System.out.println("subset candidate is " + candidatesTmp);
-				}
-				System.out.println("ending ------------");
 
 				for (Set<String> tmpCandidate : subsetCandidates)
 				{
@@ -169,32 +171,55 @@ public class ExtractAssociationRule {
 			}
 			removeUnQualified(mapping, totalNumTransaction, largeSetId, supportValue);
 		}
-		for (Map.Entry<Integer, Map<Set<String>, Integer>> entryTmp : mapping.entrySet())
-		{
-			System.out.println("group number is " + entryTmp.getKey());
-			for (Map.Entry<Set<String>, Integer> entryTmp2 : entryTmp.getValue().entrySet())
+		
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter("example-run.txt", "UTF-8");
+			System.out.println("support value is " + supportValue);
+			writer.println("==Frequent itemsets (min_sup=" + String.format("%.0f%%",supportValue*100) +")");
+
+			for (Map.Entry<Integer, Map<Set<String>, Integer>> entryTmp : mapping.entrySet())
 			{
-				System.out.println("set string is " + entryTmp2.getKey());
-				System.out.println("set string appear time is " + entryTmp2.getValue());
+				//System.out.println("group number is " + entryTmp.getKey());
+				for (Map.Entry<Set<String>, Integer> entryTmp2 : entryTmp.getValue().entrySet())
+				{
+					writer.println(entryTmp2.getKey() + "," + String.format("%.0f%%", 
+							((double)entryTmp2.getValue()/totalNumTransaction)*100));
+				}
 			}
+			writer.println();
+			writer.println("High-confidence association rules (min_conf=" + String.format("%.0f%%",confidenceValue*100) +")");
+
+			Set<AssociationRule> rules = produceAssociationRule(mapping, confidenceValue, totalNumTransaction);
+			for (AssociationRule each : rules)
+			{
+				writer.print(each.leftSide);
+				writer.print(" => ");
+				writer.print(each.rightSide);
+				writer.println(" (Conf: " +  String.format("%.0f%%",each.confidence*100) + ", " + "Supp: " + 
+						String.format("%.0f%%", each.support*100) + ")");
+			}
+			writer.close();
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
+		
+		
 		System.out.println("--------------------------------");
-		List<AssociationRule> rules = produceAssociationRule(mapping, confidenceValue, totalNumTransaction);
-		for (AssociationRule each : rules)
-		{
-			System.out.println("left side is " + each.leftSide);
-			System.out.println("right side is " + each.rightSide);
-			System.out.println("confidence value is " + each.confidence);
-			System.out.println("support value is " + each.support);
-		}
+		
 		
 	}
 
-	private static List<AssociationRule> produceAssociationRule (Map<Integer, Map<Set<String>, Integer>> mapping,
+	private static Set<AssociationRule> produceAssociationRule (Map<Integer, Map<Set<String>, Integer>> mapping,
 			double confidenceValue, int totalNumTransaction)
 			{
-		List<AssociationRule> ret = new ArrayList<AssociationRule>();
+		Set<AssociationRule> ret = new HashSet<AssociationRule>();
 		for (Map.Entry<Integer, Map<Set<String>, Integer>> entry : mapping.entrySet())
 		{
 			if (entry.getKey() == 1)
@@ -319,6 +344,7 @@ public class ExtractAssociationRule {
 				if (!mapping.get(round).containsKey(checkItem))
 				{
 					it.remove();
+					break;
 				}
 			}
 		}
@@ -367,7 +393,7 @@ public class ExtractAssociationRule {
 			}
 		}
 	}
-	private static int  calculateOneItemSet(Map<Integer, Integer> lineAppear, Map<Set<String>, Integer> OneItemLargeSet, Map<Integer, Set<String>> eachLineInfo)
+	private static int  calculateOneItemSet (Map<Integer, Integer> lineAppear, Map<Set<String>, Integer> OneItemLargeSet, Map<Integer, Set<String>> eachLineInfo)
 	{
 		int totalNumTransaction = 0;
 		try {
@@ -393,7 +419,7 @@ public class ExtractAssociationRule {
 				totalNumTransaction += appearTime;
 
 				Set<String> eachLineGTerm = new HashSet<String>();
-				for (int i = 0; i < 4; i ++)
+				for (int i = 1; i < 4; i ++)
 				{
 					Set<String> tmp = new HashSet<String>();
 					tmp.add(csvRecord.get(i));
@@ -409,11 +435,11 @@ public class ExtractAssociationRule {
 				}
 				eachLineInfo.put(count++, eachLineGTerm);
 			}
-			for (Map.Entry<Set<String>, Integer> entry : OneItemLargeSet.entrySet())
-			{
-				System.out.println("string is " + entry.getKey());
-				System.out.println("appear time is " + entry.getValue());
-			}
+//			for (Map.Entry<Set<String>, Integer> entry : OneItemLargeSet.entrySet())
+//			{
+//				System.out.println("string is " + entry.getKey());
+//				System.out.println("appear time is " + entry.getValue());
+//			}
 
 		}
 		catch(FileNotFoundException ex) {
